@@ -195,7 +195,7 @@ https://common-lisp.net/project/alexandria/draft/alexandria.html#Hash-Tables
 
  
 
-(defun parse-fasta(filename parser)
+(defun parse-fasta2(filename parser)
     (with-open-file (stream1 filename)
         (let ((label nil))
           (loop for line = (read-line stream1 nil ) while line  
@@ -205,7 +205,7 @@ https://common-lisp.net/project/alexandria/draft/alexandria.html#Hash-Tables
         (close stream1)))
 
 
-(parse-fasta "/media/sf_tmp/rosalind_cons.txt"  parser )
+;(parse-fasta "/media/sf_tmp/rosalind_cons.txt"  parser )
 (defun print-arr()
   (loop for i from 0 to 3
         do(progn(format t "~%~a: " i)
@@ -239,5 +239,33 @@ https://common-lisp.net/project/alexandria/draft/alexandria.html#Hash-Tables
     (if (= month 1) 
       (+ repr new)
       (dead-rabbits (1- month)  (cons new (reverse (cdr (reverse life)))) (* repl-factor repr) (- (+ repr new) dead) ))))
+
+;http://rosalind.info/problems/grph/
+;
+;  (make-hash-table :test #'equal)
+
+(defun parse-fasta(filename data)
+  "Parser FASTA format `filename` to `data` hash-table (make-hash-table :test #'equal)"
+  (defun append-to-data (label line)
+    (when (typecase data (hash-table t)) ; only hash table supported for now
+      (setf (gethash label data) (concatenate 'string (gethash label data) line))))
+  
+  ; using closure for add each element to `data`
+  (let ((prev_label nil)(iter 0)) 
+    (defun parser (label line)
+      (if (equal prev_label label)
+            (append-to-data label line)
+            (progn 
+              (setf  iter 0)
+              (setf prev_label label)))))
+  
+  ; line by line passing each to parser()
+  (with-open-file (stream1 filename)
+    (let ((label nil))
+          (loop for line = (read-line stream1 nil ) while line  
+                do (if (eql (char line 0) #\>)
+                     (setf label (subseq line 1)))
+                (parser label line)))
+        (close stream1)))
 
 

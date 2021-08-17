@@ -1,5 +1,8 @@
 ;(defconstant rcl-bin "rclone")
 ;(defconstant rcl-prm-rmt "listremotes")
+;
+
+
 
 (defun read-stream-ret-list (strm &optional (output))
   "reads from stream and returns list of strings in reversed order"
