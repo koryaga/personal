@@ -244,6 +244,7 @@ https://common-lisp.net/project/alexandria/draft/alexandria.html#Hash-Tables
 ;
 ;  (make-hash-table :test #'equal)
 
+
 (defun parse-fasta(filename data)
   "Parser FASTA format `filename` to `data` hash-table (make-hash-table :test #'equal)"
   (defun append-to-data (label line)
@@ -267,5 +268,35 @@ https://common-lisp.net/project/alexandria/draft/alexandria.html#Hash-Tables
                      (setf label (subseq line 1)))
                 (parser label line)))
         (close stream1)))
+
+(defun grph (filename)
+  (let ((hash (make-hash-table :test #'equal))
+         (label))
+    (parse-fasta filename hash)
+    (setf label (alexandria:hash-table-keys hash))
+    (defun grph-recur (check-dna graph-list)
+      (when graph-list
+        (let* ((dna (gethash check-dna hash))
+               (len (length dna))
+               (start (subseq dna 0 3))
+               (end (subseq  dna (- len 3) len )))
+          ;(format t "[~a ~a]~%" check-dna graph-list)
+          (loop for i in graph-list
+                do(let* ((dnai (gethash i hash))
+                         (leni (length dnai))
+                         (starti (subseq dnai 0 3))
+                         (endi (subseq dnai (- leni 3) leni)))
+                    (when (and (or (equal start endi)
+                                   (equal end starti))
+                               (not (equal dna dnai)))
+                      (format t "~a ~a ~%" i check-dna ))))
+          (grph-recur (car graph-list) (cdr graph-list)))))
+    (grph-recur (car label) (cdr label))))
+
+(grph "~/rosalind_grph.txt")
+(exit)
+
+
+
 
 
