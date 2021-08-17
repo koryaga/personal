@@ -286,10 +286,9 @@ https://common-lisp.net/project/alexandria/draft/alexandria.html#Hash-Tables
                          (leni (length dnai))
                          (starti (subseq dnai 0 3))
                          (endi (subseq dnai (- leni 3) leni)))
-                    (when (and (or (equal start endi)
-                                   (equal end starti))
-                               (not (equal dna dnai)))
-                      (format t "~a ~a ~%" i check-dna ))))
+                    (cond ((and (equal start endi) (not (equal dna dnai))) (format t "~a ~a ~%" i check-dna ))
+                          ((and (equal end starti) (not (equal dna dnai))) (format t "~a ~a ~%" check-dna i
+                                                                                 )))))
           (grph-recur (car graph-list) (cdr graph-list)))))
     (grph-recur (car label) (cdr label))))
 
