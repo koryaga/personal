@@ -255,9 +255,7 @@ https://common-lisp.net/project/alexandria/draft/alexandria.html#Hash-Tables
     (defun parser (label line)
       (if (equal prev_label label)
             (append-to-data label line)
-            (progn 
-              (setf  iter 0)
-              (setf prev_label label)))))
+	    (setf  iter 0 prev_label label))))
   
   ; line by line passing each to parser()
   (with-open-file (stream1 filename)
