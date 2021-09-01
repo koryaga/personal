@@ -241,10 +241,6 @@ https://common-lisp.net/project/alexandria/draft/alexandria.html#Hash-Tables
       (dead-rabbits (1- month)  (cons new (reverse (cdr (reverse life)))) (* repl-factor repr) (- (+ repr new) dead) ))))
 
 ;http://rosalind.info/problems/grph/
-;
-;  (make-hash-table :test #'equal)
-
-
 (defun parse-fasta(filename data)
   "Parser FASTA format `filename` to `data` hash-table (make-hash-table :test #'equal)"
   (defun append-to-data (label line)
@@ -267,7 +263,8 @@ https://common-lisp.net/project/alexandria/draft/alexandria.html#Hash-Tables
                 (parser label line)))
         (close stream1)))
 
-(defun grph (filename)
+(defun grph (filename file-out)
+  "Culculate overlap graphs"
   (let ((hash (make-hash-table :test #'equal))
          (label))
     (parse-fasta filename hash)
@@ -284,14 +281,15 @@ https://common-lisp.net/project/alexandria/draft/alexandria.html#Hash-Tables
                          (leni (length dnai))
                          (starti (subseq dnai 0 3))
                          (endi (subseq dnai (- leni 3) leni)))
-                    (cond ((and (equal start endi) (not (equal dna dnai))) (format t "~a ~a ~%" i check-dna ))
-                          ((and (equal end starti) (not (equal dna dnai))) (format t "~a ~a ~%" check-dna i
-                                                                                 )))))
+                    (with-open-file (output-stream file-out :direction :output :if-exists :append
+                                                   :if-does-not-exist :create)
+                        (when (and (equal start endi) (not (equal dna dnai))) 
+                          (format output-stream "~a ~a ~%" i check-dna ))
+                        (when (and (equal end starti) (not (equal dna dnai))) 
+                          (format output-stream "~a ~a ~%" check-dna i )) )))
           (grph-recur (car graph-list) (cdr graph-list)))))
     (grph-recur (car label) (cdr label))))
 
-(grph "~/rosalind_grph.txt")
-(exit)
 
 
 
